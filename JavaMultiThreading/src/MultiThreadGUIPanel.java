@@ -43,6 +43,8 @@ public class MultiThreadGUIPanel extends JPanel {
 
 	private ThreadList threadList;
 
+	private boolean isStarted = false;
+
 	/**
 	 * Constructs the window
 	 */
@@ -148,21 +150,32 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	private void startProcess() {
 
+		if (isStarted) {
+			stopProcess();
+		}
+
 		for (int i = 0; i < numThreads; i++) {
 			thread = new Threads();
 			thread.start();
-			threadList.addThread("Thread ID: " + thread.getId());
+			threadList.addThread((i + 1) + " - Thread ID: " + thread.getId());
 		}
+
+		isStarted = true;
 	}
 
 	/**
 	 * Clears threads and thread information
 	 */
 	private void stopProcess() {
-		thread.stopThreads();
-		threadList.clearList();
-		threadLabel.setText("Number of Threads: 0");
-		refreshList();
+
+		if (isStarted) {
+			thread.stopThreads();
+			threadList.clearList();
+			threadLabel.setText("Number of Threads: 0");
+			refreshList();
+			isStarted = false;
+		}
+
 	}
 
 	/**
@@ -186,18 +199,29 @@ public class MultiThreadGUIPanel extends JPanel {
 				refreshList();
 			} else if (arg0.getSource() == startButton) {
 
-				String result = JOptionPane.showInputDialog("Enter number of threads");
-				Scanner in = new Scanner(result);
-				numThreads = in.nextInt();
+				String result = JOptionPane.showInputDialog("Enter number of threads (Max 32)");
+				if (result == null || result.length() == 0) {
+					// Do nothing
+				} else {
+					Scanner in = new Scanner(result);
+					try {
+						numThreads = Integer.parseInt(in.next());
+					} catch (NumberFormatException e) {
+						// TODO: Add popup info
+						System.err.println("Must be an integer in the range (0 - 32)");
+					}
+					if (numThreads < 1 || numThreads > 32) {
+						startButton.doClick();
+					} else {
+						/*
+						 * Creates threads
+						 */
+						startProcess();
+						threadLabel.setText("Number of Threads: " + numThreads);
+					}
+					in.close();
+				}
 
-				in.close();
-
-				/*
-				 * Creates threads
-				 */
-				startProcess();
-
-				threadLabel.setText("Number of Threads: " + Integer.toString(numThreads));
 			} else if (arg0.getSource() == stopButton) {
 				stopProcess();
 			}
