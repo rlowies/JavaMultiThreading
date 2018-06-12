@@ -16,6 +16,12 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ * @author ronlo
+ * 
+ * User interface and main functionality. 
+ *
+ */
 public class MultiThreadGUIPanel extends JPanel {
 	
 
@@ -48,20 +54,37 @@ public class MultiThreadGUIPanel extends JPanel {
 		westPanel();
 		centerPanel();
 		southPanel();
+		eastPanel();
+	}
+
+	/**
+	 * To contain a graph or other information
+	 */
+	private void eastPanel() {
+		JPanel eastPanel = new JPanel();
+		eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.X_AXIS));
+		add(eastPanel, BorderLayout.EAST);
+		
+		/*
+		 * TODO: Remove later
+		 */
+		JLabel testLabel = new JLabel();
+		testLabel.setText(" - - - - Testing some stuff - - - - ");
+		eastPanel.add(testLabel);
 	}
 
 	/**
 	 *  Contains the text label for number of threads.
 	 */
 	private void southPanel() {
-		JPanel innerCenter = new JPanel();
-		innerCenter.setLayout(new BoxLayout(innerCenter,BoxLayout.X_AXIS ));
-		add(innerCenter,BorderLayout.SOUTH);
+		JPanel southPanel = new JPanel();
+		southPanel.setLayout(new BoxLayout(southPanel,BoxLayout.X_AXIS ));
+		add(southPanel,BorderLayout.SOUTH);
 		
 		threadLabel = new JLabel();
-		threadLabel.setText("Number of Threads: ");
+		threadLabel.setText("Number of Threads: 0");
 		
-		innerCenter.add(threadLabel);		
+		southPanel.add(threadLabel);		
 	}
 
 	/**
@@ -145,7 +168,7 @@ public class MultiThreadGUIPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if(arg0.getSource() == showThreadsButton) {
-				threadListJList.setListData(threadList.getThreadArray());
+				refreshList();
 			} 
 			else if (arg0.getSource() == startButton) {
 				
@@ -163,10 +186,19 @@ public class MultiThreadGUIPanel extends JPanel {
 				threadLabel.setText("Number of Threads: " + Integer.toString(numThreads));
 			} 
 			else if (arg0.getSource() == stopButton) {
-					thread.stopThreads();
-					threadList.clearList();
-					threadListJList.setListData(threadList.getThreadArray());
+				stopProcess();
 			}
+		}
+
+		private void refreshList() {
+			threadListJList.setListData(threadList.getThreadArray());			
+		}
+
+		private void stopProcess() {
+			thread.stopThreads();
+			threadList.clearList();
+			threadLabel.setText("Number of Threads: 0");
+			refreshList();
 		}
 		
 	}

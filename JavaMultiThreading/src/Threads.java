@@ -1,5 +1,11 @@
 import java.util.ArrayList;
 
+/**
+ * @author ronlo
+ * 
+ * Creates a thread and controls it.
+ *
+ */
 public class Threads extends Thread {
 	
 	private ArrayList<Thread> threads;

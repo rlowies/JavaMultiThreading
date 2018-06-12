@@ -6,6 +6,8 @@ import javax.swing.UIManager;
 /**
  * @author ronlo
  * 
+ * This program is demonstrating java multithreading.
+ * Each thread will be displayed and show information about the problem solved.
  *
  */
 public class MultiThreadGUI {
