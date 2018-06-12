@@ -3,7 +3,7 @@ import java.util.ArrayList;
 /**
  * @author ronlo
  * 
- * Maintains the information identifying each thread.
+ *         Maintains the information identifying each thread.
  *
  */
 public class ThreadList {
@@ -33,7 +33,8 @@ public class ThreadList {
 	/**
 	 * Adds text to array that will be added to JList
 	 * 
-	 * @param t (thread information)
+	 * @param t
+	 *            (thread information)
 	 */
 	public void addThread(String t) {
 		threadList.add(t);

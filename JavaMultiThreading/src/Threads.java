@@ -3,22 +3,22 @@ import java.util.ArrayList;
 /**
  * @author ronlo
  * 
- * Creates a thread and controls it.
+ *         Creates a thread and controls it.
  *
  */
 public class Threads extends Thread {
-	
+
 	private ArrayList<Thread> threads;
 	private Thread thread;
-	
+
 	public Threads() {
 		setThread(new Thread());
 	}
-	
+
 	public void run() {
 		try {
 			System.out.println("Thread ID: " + Thread.currentThread().getId());
-			if(threads == null) {
+			if (threads == null) {
 				threads = new ArrayList<Thread>();
 			}
 			threads.add(getThread());
@@ -26,9 +26,9 @@ public class Threads extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void stopThreads() {
-		for(int i = 0; i < threads.size(); i++) {
+		for (int i = 0; i < threads.size(); i++) {
 			threads.set(i, null);
 		}
 	}
@@ -40,9 +40,5 @@ public class Threads extends Thread {
 	public void setThread(Thread thread) {
 		this.thread = thread;
 	}
-
-	
-	
-	
 
 }
