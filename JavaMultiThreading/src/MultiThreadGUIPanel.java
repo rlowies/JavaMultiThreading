@@ -1,7 +1,7 @@
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Scanner;
@@ -30,9 +30,9 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int HIRES_FONTSIZE = 26;//, LOWRES_FONTSIZE = 12;
+	private static final int HIRES_FONTSIZE = 26;// , LOWRES_FONTSIZE = 12;
 
-	private JButton showThreadsButton, startButton, stopButton;
+	private JButton showThreadsButton, startButton, stopButton, drawButton;
 
 	private int numThreads; // Current number of threads.
 
@@ -46,6 +46,14 @@ public class MultiThreadGUIPanel extends JPanel {
 
 	private boolean isStarted = false; // Indicates if the threads are started.
 
+	private Image image;
+	private JPanel eastPanel;
+	private boolean drawing = false;
+
+	private static final int canvasWidth = 600;
+
+	private static final int canvasHeight = 400;
+
 	/**
 	 * Constructs the window
 	 */
@@ -57,22 +65,25 @@ public class MultiThreadGUIPanel extends JPanel {
 		westPanel();
 		centerPanel();
 		southPanel();
-		eastPanel(); //Canvas
+		eastPanel(); // Canvas
 	}
 
 	/**
 	 * To contain a graph or other information
 	 */
 	private void eastPanel() {
-
-		JPanel eastPanel = new JPanel();
+		eastPanel = new JPanel();
 		eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.X_AXIS));
-		add(eastPanel, BorderLayout.EAST);
+		eastPanel.setBorder(BorderFactory.createEtchedBorder());
+		eastPanel.setPreferredSize(new Dimension(canvasWidth, canvasHeight));
 		
-		Image image = new Image();
+		add(eastPanel, BorderLayout.EAST);
+		if(!drawing) {
+		image = new Image();
 		image.setCanvas(new Image());
-		image.getCanvas().setSize(400,400);
+		image.getCanvas().setSize(canvasWidth, canvasHeight);
 		eastPanel.add(image.getCanvas());
+		}
 		
 	}
 
@@ -105,21 +116,25 @@ public class MultiThreadGUIPanel extends JPanel {
 		startButton = new JButton();
 		showThreadsButton = new JButton();
 		stopButton = new JButton();
+		drawButton = new JButton();
 
 		// Set text
 		startButton.setText("Start");
 		showThreadsButton.setText("Show Threads");
 		stopButton.setText("Stop");
+		drawButton.setText("Draw");
 
 		// Listeners
 		startButton.addActionListener(new ButtonListener());
 		showThreadsButton.addActionListener(new ButtonListener());
 		stopButton.addActionListener(new ButtonListener());
+		drawButton.addActionListener(new ButtonListener());
 
 		// Add to panel
 		westPanel.add(startButton);
 		westPanel.add(showThreadsButton);
 		westPanel.add(stopButton);
+		westPanel.add(drawButton);
 
 	}
 
@@ -183,6 +198,7 @@ public class MultiThreadGUIPanel extends JPanel {
 			threadLabel.setText("Number of Threads: 0");
 			refreshList();
 			isStarted = false;
+			drawing = false;
 		}
 
 	}
@@ -193,7 +209,17 @@ public class MultiThreadGUIPanel extends JPanel {
 	private void refreshList() {
 		threadListJList.setListData(threadList.getThreadArray());
 	}
-
+	
+	public void threadDraw(int x, int y) {
+		if(eastPanel != null) {
+			this.remove(eastPanel);
+		}
+		eastPanel();
+		Graphics g = getGraphics();
+		image.paint(g, x, y, getWidth(), canvasHeight);
+		add(eastPanel, BorderLayout.EAST);
+		this.revalidate(); //TODO: remove this line and draw twice to see bug
+	}
 	/**
 	 * @author ronlo
 	 * 
@@ -233,8 +259,19 @@ public class MultiThreadGUIPanel extends JPanel {
 
 			} else if (arg0.getSource() == stopButton) {
 				stopProcess();
+			} else if (arg0.getSource() == drawButton) {
+				drawing = true;
+				//Draws a square
+				for(int x = 1; x < canvasWidth; x++) {
+					for(int y = 1; y < canvasHeight; y++) {						
+						threadDraw(x, y);
+						//TODO: Add interrupt to allow button clicks for stopping
+					}
+				}
+				drawing = false;
 			}
 		}
+
 
 	}
 
