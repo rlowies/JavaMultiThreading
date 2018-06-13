@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -25,59 +26,61 @@ import javax.swing.event.ListSelectionListener;
 public class MultiThreadGUIPanel extends JPanel {
 
 	/**
-	 * Automated
+	 * Automated Serial
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public static final int HIRES_FONTSIZE = 26, LOWRES_FONTSIZE = 12;
+	private static final int HIRES_FONTSIZE = 26;//, LOWRES_FONTSIZE = 12;
 
 	private JButton showThreadsButton, startButton, stopButton;
 
-	private JLabel threadLabel;
+	private int numThreads; // Current number of threads.
 
-	private JList<String> threadListJList; // Added to JScrollPane
+	private JLabel threadLabel; // To display number of threads.
 
-	private int numThreads; // Current number of threads
+	private JList<String> threadListJList; // List of the threads.
 
 	private Threads thread; // Thread variable.
 
-	private ThreadList threadList;
+	private ThreadList threadList; // List of the created threads in String format.
 
-	private boolean isStarted = false;
+	private boolean isStarted = false; // Indicates if the threads are started.
 
 	/**
 	 * Constructs the window
 	 */
 	public MultiThreadGUIPanel() {
+
 		setLayout(new BorderLayout());
 		threadList = new ThreadList();
 
 		westPanel();
 		centerPanel();
 		southPanel();
-		eastPanel();
+		eastPanel(); //Canvas
 	}
 
 	/**
 	 * To contain a graph or other information
 	 */
 	private void eastPanel() {
+
 		JPanel eastPanel = new JPanel();
 		eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.X_AXIS));
 		add(eastPanel, BorderLayout.EAST);
-
-		/*
-		 * TODO: Remove later
-		 */
-		JLabel testLabel = new JLabel();
-		testLabel.setText(" - - - - Testing some stuff - - - - ");
-		eastPanel.add(testLabel);
+		
+		Image image = new Image();
+		image.setCanvas(new Image());
+		image.getCanvas().setSize(400,400);
+		eastPanel.add(image.getCanvas());
+		
 	}
 
 	/**
 	 * Contains the text label for number of threads.
 	 */
 	private void southPanel() {
+
 		JPanel southPanel = new JPanel();
 		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.X_AXIS));
 		add(southPanel, BorderLayout.SOUTH);
@@ -124,6 +127,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	 * Text for thread information to go here
 	 */
 	private void centerPanel() {
+
 		JPanel centerPanel = new JPanel();
 		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.X_AXIS));
 		add(centerPanel, BorderLayout.CENTER);
@@ -137,9 +141,11 @@ public class MultiThreadGUIPanel extends JPanel {
 		// Add a ListSelectionListener
 		threadListJList.addListSelectionListener(new ListListener());
 		// Create a JScrollPane
+
 		JScrollPane scrollPane = new JScrollPane(threadListJList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(600, 400));
+
 		// add the scroll pane to the left panel
 		scrollPane.setBorder(BorderFactory.createEtchedBorder());
 		centerPanel.add(scrollPane, BorderLayout.WEST);
@@ -149,11 +155,14 @@ public class MultiThreadGUIPanel extends JPanel {
 	 * Creates threads and stores corresponding information.
 	 */
 	private void startProcess() {
-
+		/*
+		 * Prevents the user from stacking threads if the stop button is not clicked
+		 * before starting.
+		 */
 		if (isStarted) {
 			stopProcess();
 		}
-
+		// Creates the specified number of threads
 		for (int i = 0; i < numThreads; i++) {
 			thread = new Threads();
 			thread.start();
