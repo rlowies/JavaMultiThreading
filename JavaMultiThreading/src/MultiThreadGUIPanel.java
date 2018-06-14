@@ -1,6 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,12 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 /**
  * @author ronlo
  * 
@@ -28,14 +21,10 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final int HIRES_FONTSIZE = 26;// , LOWRES_FONTSIZE = 12;
-
 	private JButton clearButton, drawButton, stopButton;
 
 
-	private JLabel threadLabel, timeLabel; // To display number of threads.
-
-	private JList<String> threadListJList; // List of the threads.
+	private JLabel timeLabel; // To display number of threads.
 
 	private Thread t;
 
@@ -47,7 +36,7 @@ public class MultiThreadGUIPanel extends JPanel {
 
 	public Long startTime, stopTime;
 
-	protected boolean drawing = false;
+	protected boolean drawing;
 
 	/**
 	 * Constructs the window
@@ -82,13 +71,10 @@ public class MultiThreadGUIPanel extends JPanel {
 		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.X_AXIS));
 		add(southPanel, BorderLayout.SOUTH);
 
-		threadLabel = new JLabel();
-		threadLabel.setText("Number of Threads: 0");
 
 		timeLabel = new JLabel();
-		timeLabel.setText(" - Time elapsed: ");
+		timeLabel.setText("Time elapsed: ");
 
-		southPanel.add(threadLabel);
 		southPanel.add(timeLabel);
 	}
 
@@ -118,6 +104,7 @@ public class MultiThreadGUIPanel extends JPanel {
 		//showThreadsButton.addActionListener(new ButtonListener());
 		clearButton.addActionListener(new ButtonListener());
 		stopButton.addActionListener(new ButtonListener());
+		stopButton.setEnabled(false);
 
 		// Threaded
 		drawButton.addActionListener(new ActionListener() {
@@ -129,7 +116,7 @@ public class MultiThreadGUIPanel extends JPanel {
 					@Override
 					public void run() {
 						buttonControl();
-						
+						drawing = true;
 						startTime = System.currentTimeMillis(); // 1000L;//(System.currentTimeMillis() * (long) 0.001);
 						for (int x = 1; x < canvasWidth; x++) {
 							for (int y = 1; y < canvasHeight; y++) {
@@ -141,10 +128,12 @@ public class MultiThreadGUIPanel extends JPanel {
 								}
 								// TODO: Add interrupt to allow button clicks for stopping
 								if (x == canvasWidth - 2) {
+									stopButton.setEnabled(false);
+									drawing = false;
 									try {
 										stopTime = System.currentTimeMillis(); // 1000L;
 										timeLabel.setText(
-												" - Time elapsed: " + Long.toString(stopTime - startTime) + " ms");
+												"Time elapsed: " + Long.toString(stopTime - startTime) + " ms");
 										t.join();
 									} catch (InterruptedException e) {
 										// TODO Auto-generated catch block
@@ -152,11 +141,18 @@ public class MultiThreadGUIPanel extends JPanel {
 									}
 								}
 							}
+							
 						}
 					}
 
 					private synchronized void buttonControl() {
-							drawButton.setEnabled(false);
+						 		drawButton.setEnabled(false);
+						 		
+						 		if(!stopButton.isEnabled()) {
+						 			stopButton.setEnabled(true);
+						 		}
+						
+							
 					}
 				};
 				t.start();
@@ -185,24 +181,7 @@ public class MultiThreadGUIPanel extends JPanel {
 		centerPanel.setSize(100, 100);
 		add(centerPanel, BorderLayout.CENTER);
 
-		threadListJList = new JList<String>();
-		threadListJList.setSelectionMode(0);
 
-		// Lines up the text in the scroll pane. //TODO: Add resolution changer
-		threadListJList.setFont(new Font(Font.MONOSPACED, Font.BOLD, HIRES_FONTSIZE));
-
-		// Add a ListSelectionListener
-		threadListJList.addListSelectionListener(new ListListener());
-		// Create a JScrollPane
-
-		JScrollPane scrollPane = new JScrollPane(threadListJList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setSize(new Dimension(600, 400));
-
-		// add the scroll pane to the left panel
-		scrollPane.setBorder(BorderFactory.createEtchedBorder());
-
-		centerPanel.add(scrollPane, BorderLayout.WEST);
 	}
 
 	/**
@@ -210,12 +189,17 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	private synchronized void clearDraw() {
 		repaint();
-		drawButton.setEnabled(true);
+		if(drawing) {
+		drawButton.setEnabled(false);
+		} else {
+			drawButton.setEnabled(true);
+		}
 	}
 	
 	private synchronized void stopDraw() {
 		if(t != null) {
 		t.interrupt();
+		drawing = false;
 		}
 	}
 	
@@ -244,21 +228,6 @@ public class MultiThreadGUIPanel extends JPanel {
 			} else if (arg0.getSource() == stopButton) {
 				stopDraw();
 			}
-		}
-
-	}
-
-	/**
-	 * @author ronlo
-	 * 
-	 *         Listens for List clicks
-	 *
-	 */
-	private class ListListener implements ListSelectionListener {
-
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-
 		}
 
 	}
