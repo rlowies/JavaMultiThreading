@@ -36,11 +36,11 @@ public class MultiThreadGUIPanel extends JPanel {
 
 	private int numThreads; // Current number of threads.
 
-	private JLabel threadLabel; // To display number of threads.
+	private JLabel threadLabel, timeLabel; // To display number of threads.
 
 	private JList<String> threadListJList; // List of the threads.
 
-	private Threads thread; // Thread variable.
+	private Thread[] thread; // Thread variable.
 
 	private ThreadList threadList; // List of the created threads in String format.
 
@@ -49,7 +49,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	private Image image;
 	private JPanel eastPanel;
 	private boolean drawing = false;
-
+	
 	private static final int canvasWidth = 600;
 
 	private static final int canvasHeight = 400;
@@ -58,7 +58,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	 * Constructs the window
 	 */
 	public MultiThreadGUIPanel() {
-
+		
 		setLayout(new BorderLayout());
 		threadList = new ThreadList();
 
@@ -98,8 +98,12 @@ public class MultiThreadGUIPanel extends JPanel {
 
 		threadLabel = new JLabel();
 		threadLabel.setText("Number of Threads: 0");
+		
+	    timeLabel = new JLabel();
+		timeLabel.setText(" - Time elapsed: ");
 
 		southPanel.add(threadLabel);
+		southPanel.add(timeLabel);
 	}
 
 	/**
@@ -170,6 +174,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	 * Creates threads and stores corresponding information.
 	 */
 	private void startProcess() {
+		thread = new Threads[numThreads];
 		/*
 		 * Prevents the user from stacking threads if the stop button is not clicked
 		 * before starting.
@@ -179,9 +184,9 @@ public class MultiThreadGUIPanel extends JPanel {
 		}
 		// Creates the specified number of threads
 		for (int i = 0; i < numThreads; i++) {
-			thread = new Threads();
-			thread.start();
-			threadList.addThread((i + 1) + " - Thread ID: " + thread.getId());
+			thread[i] = new Threads();
+			thread[i].start();
+			threadList.addThread((i + 1) + " - Thread ID: " + thread[i].getId());
 		}
 
 		isStarted = true;
@@ -193,7 +198,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	private void stopProcess() {
 
 		if (isStarted) {
-			thread.stopThreads();
+//			thread.stopThreads();
 			threadList.clearList();
 			threadLabel.setText("Number of Threads: 0");
 			refreshList();
@@ -262,12 +267,21 @@ public class MultiThreadGUIPanel extends JPanel {
 			} else if (arg0.getSource() == drawButton) {
 				drawing = true;
 				//Draws a square
+				System.out.println(Thread.currentThread().getState());
+				for(int i = 0; i < numThreads; i++) {
+					thread[i].run();
+				}
+				long startTime = System.currentTimeMillis(); // 1000L;//(System.currentTimeMillis() * (long) 0.001);
 				for(int x = 1; x < canvasWidth; x++) {
-					for(int y = 1; y < canvasHeight; y++) {						
+					for(int y = 1; y < canvasHeight; y++) {	
 						threadDraw(x, y);
 						//TODO: Add interrupt to allow button clicks for stopping
 					}
 				}
+				long stopTime = System.currentTimeMillis(); // 1000L;
+				
+				timeLabel.setText(" - Time elapsed: " + Long.toString(stopTime - startTime) + " ms");
+				
 				drawing = false;
 			}
 		}

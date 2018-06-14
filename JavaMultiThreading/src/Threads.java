@@ -1,44 +1,42 @@
 import java.util.ArrayList;
 
-/**
- * @author ronlo
- * 
- *         Creates a thread and controls it.
- *
- */
 public class Threads extends Thread {
-
-	private ArrayList<Thread> threads;
-	private Thread thread;
-
-	public Threads() {
-		setThread(new Thread());
-	}
-
+	
+//	private ArrayList<Thread> threads;
+//	private Thread thread;
+	
+//	public Threads() {
+//		setThread(new Thread());
+//	}
+	
 	public void run() {
 		try {
 			System.out.println("Thread ID: " + Thread.currentThread().getId());
-			if (threads == null) {
-				threads = new ArrayList<Thread>();
-			}
-			threads.add(getThread());
+//			if(threads == null) {
+//				threads = new ArrayList<Thread>();
+//			}
+//			threads.add(getThread());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+//	public void stopThreads() {
+//		for(int i = 0; i < threads.size(); i++) {
+//			threads.set(i, null);
+//		}
+//	}
+//
+//	public Thread getThread() {
+//		return thread;
+//	}
+//
+//	public void setThread(Thread thread) {
+//		this.thread = thread;
+//	}
 
-	public void stopThreads() {
-		for (int i = 0; i < threads.size(); i++) {
-			threads.set(i, null);
-		}
-	}
-
-	public Thread getThread() {
-		return thread;
-	}
-
-	public void setThread(Thread thread) {
-		this.thread = thread;
-	}
+	
+	
+	
 
 }
