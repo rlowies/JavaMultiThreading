@@ -8,6 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 /**
  * @author ronlo
  * 
@@ -22,7 +23,6 @@ public class MultiThreadGUIPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JButton clearButton, drawButton, stopButton;
-
 
 	private JLabel timeLabel; // To display number of threads.
 
@@ -47,7 +47,7 @@ public class MultiThreadGUIPanel extends JPanel {
 
 		southPanel();
 		westPanel();
-//		centerPanel();
+		// centerPanel();
 
 		createCanvas();
 	}
@@ -71,7 +71,6 @@ public class MultiThreadGUIPanel extends JPanel {
 		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.X_AXIS));
 		add(southPanel, BorderLayout.SOUTH);
 
-
 		timeLabel = new JLabel();
 		timeLabel.setText("Time elapsed: ");
 
@@ -89,19 +88,19 @@ public class MultiThreadGUIPanel extends JPanel {
 		/*
 		 * Create buttons
 		 */
-	//	showThreadsButton = new JButton();
+		// showThreadsButton = new JButton();
 		clearButton = new JButton();
 		drawButton = new JButton();
 		stopButton = new JButton();
 
 		// Set text
-		//showThreadsButton.setText("Show Threads");
+		// showThreadsButton.setText("Show Threads");
 		clearButton.setText("Clear");
 		drawButton.setText("Draw");
 		stopButton.setText("Stop");
 
 		// Listeners
-		//showThreadsButton.addActionListener(new ButtonListener());
+		// showThreadsButton.addActionListener(new ButtonListener());
 		clearButton.addActionListener(new ButtonListener());
 		stopButton.addActionListener(new ButtonListener());
 		stopButton.setEnabled(false);
@@ -121,9 +120,8 @@ public class MultiThreadGUIPanel extends JPanel {
 						for (int x = 1; x < canvasWidth; x++) {
 							for (int y = 1; y < canvasHeight; y++) {
 								threadDraw(x, y);
-								
-								if(t.isInterrupted())
-								{
+
+								if (t.isInterrupted()) {
 									break;
 								}
 								// TODO: Add interrupt to allow button clicks for stopping
@@ -141,18 +139,17 @@ public class MultiThreadGUIPanel extends JPanel {
 									}
 								}
 							}
-							
+
 						}
 					}
 
 					private synchronized void buttonControl() {
-						 		drawButton.setEnabled(false);
-						 		
-						 		if(!stopButton.isEnabled()) {
-						 			stopButton.setEnabled(true);
-						 		}
-						
-							
+						drawButton.setEnabled(false);
+
+						if (!stopButton.isEnabled()) {
+							stopButton.setEnabled(true);
+						}
+
 					}
 				};
 				t.start();
@@ -161,7 +158,7 @@ public class MultiThreadGUIPanel extends JPanel {
 		});
 
 		// Add to panel
-		//westPanel.add(showThreadsButton);
+		// westPanel.add(showThreadsButton);
 		westPanel.add(clearButton);
 		westPanel.add(drawButton);
 		westPanel.add(stopButton);
@@ -171,8 +168,8 @@ public class MultiThreadGUIPanel extends JPanel {
 	/**
 	 * Text for thread information to go here
 	 */
-	
-	@SuppressWarnings("unused") //for now
+
+	@SuppressWarnings("unused") // for now
 	private void centerPanel() {
 
 		JPanel centerPanel = new JPanel();
@@ -181,7 +178,6 @@ public class MultiThreadGUIPanel extends JPanel {
 		centerPanel.setSize(100, 100);
 		add(centerPanel, BorderLayout.CENTER);
 
-
 	}
 
 	/**
@@ -189,20 +185,20 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	private synchronized void clearDraw() {
 		repaint();
-		if(drawing) {
-		drawButton.setEnabled(false);
+		if (drawing) {
+			drawButton.setEnabled(false);
 		} else {
 			drawButton.setEnabled(true);
 		}
 	}
-	
+
 	private synchronized void stopDraw() {
-		if(t != null) {
-		t.interrupt();
-		drawing = false;
+		if (t != null) {
+			t.interrupt();
+			drawing = false;
 		}
 	}
-	
+
 	/**
 	 * @param x
 	 * @param y
@@ -210,7 +206,6 @@ public class MultiThreadGUIPanel extends JPanel {
 	public void threadDraw(int x, int y) {
 		Graphics g = getGraphics();
 		image.paint(g, x, y, getWidth(), canvasHeight);
-		revalidate(); // TODO: remove this line and draw twice to see bug
 	}
 
 	/**
@@ -223,7 +218,7 @@ public class MultiThreadGUIPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			 if (arg0.getSource() == clearButton) {
+			if (arg0.getSource() == clearButton) {
 				clearDraw();
 			} else if (arg0.getSource() == stopButton) {
 				stopDraw();
