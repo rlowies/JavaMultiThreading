@@ -2,8 +2,6 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,39 +14,26 @@ import javax.swing.JPanel;
  *
  */
 public class MultiThreadGUIPanel extends JPanel {
-
 	/**
 	 * Automated Serial
 	 */
 	private static final long serialVersionUID = 1L;
-
 	private JButton clearButton, drawButton, stopButton;
-
-	private JLabel timeLabel; // To display number of threads.
-
+	private JLabel timeLabel; // To display time taken to run
 	private Thread t;
-
 	private Image image;
-
 	private static final int canvasWidth = 600;
-
 	private static final int canvasHeight = 400;
-
 	public Long startTime, stopTime;
-
 	protected boolean drawing;
 
 	/**
 	 * Constructs the window
 	 */
 	public MultiThreadGUIPanel() {
-
 		setLayout(new BorderLayout());
-
 		southPanel();
 		westPanel();
-		// centerPanel();
-
 		createCanvas();
 	}
 
@@ -66,14 +51,11 @@ public class MultiThreadGUIPanel extends JPanel {
 	 * Contains the text label for number of threads.
 	 */
 	private void southPanel() {
-
 		JPanel southPanel = new JPanel();
 		southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.X_AXIS));
 		add(southPanel, BorderLayout.SOUTH);
-
 		timeLabel = new JLabel();
 		timeLabel.setText("Time elapsed: ");
-
 		southPanel.add(timeLabel);
 	}
 
@@ -84,100 +66,66 @@ public class MultiThreadGUIPanel extends JPanel {
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
 		add(westPanel, BorderLayout.WEST);
-
-		/*
-		 * Create buttons
-		 */
-		// showThreadsButton = new JButton();
+		// Create buttons
 		clearButton = new JButton();
 		drawButton = new JButton();
 		stopButton = new JButton();
-
 		// Set text
-		// showThreadsButton.setText("Show Threads");
 		clearButton.setText("Clear");
 		drawButton.setText("Draw");
 		stopButton.setText("Stop");
-
 		// Listeners
-		// showThreadsButton.addActionListener(new ButtonListener());
 		clearButton.addActionListener(new ButtonListener());
 		stopButton.addActionListener(new ButtonListener());
 		stopButton.setEnabled(false);
-
 		// Threaded
 		drawButton.addActionListener(new ActionListener() {
-
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-
 				t = new Thread() {
 					@Override
 					public void run() {
 						buttonControl();
 						drawing = true;
-						startTime = System.currentTimeMillis(); // 1000L;//(System.currentTimeMillis() * (long) 0.001);
-						for (int x = 1; x < canvasWidth; x++) {
-							for (int y = 1; y < canvasHeight; y++) {
+						startTime = System.currentTimeMillis();
+						for (int x = 0; x <= canvasWidth; x++) {
+							for (int y = 0; y <= canvasHeight; y++) {
 								threadDraw(x, y);
-
 								if (t.isInterrupted()) {
 									break;
 								}
-								// TODO: Add interrupt to allow button clicks for stopping
-								if (x == canvasWidth - 2) {
+								if (x == canvasWidth - 1) {
 									stopButton.setEnabled(false);
 									drawing = false;
 									try {
-										stopTime = System.currentTimeMillis(); // 1000L;
+										stopTime = System.currentTimeMillis();
 										timeLabel.setText(
 												"Time elapsed: " + Long.toString(stopTime - startTime) + " ms");
 										t.join();
 									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
 								}
 							}
-
 						}
 					}
 
+					/**
+					 * Controls the visibility of buttons during the drawing process.
+					 */
 					private synchronized void buttonControl() {
 						drawButton.setEnabled(false);
-
 						if (!stopButton.isEnabled()) {
 							stopButton.setEnabled(true);
 						}
-
 					}
 				};
 				t.start();
 			}
-
 		});
-
-		// Add to panel
-		// westPanel.add(showThreadsButton);
 		westPanel.add(clearButton);
 		westPanel.add(drawButton);
 		westPanel.add(stopButton);
-
-	}
-
-	/**
-	 * Text for thread information to go here
-	 */
-
-	@SuppressWarnings("unused") // for now
-	private void centerPanel() {
-
-		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(null);
-		centerPanel.setBorder(BorderFactory.createEtchedBorder());
-		centerPanel.setSize(100, 100);
-		add(centerPanel, BorderLayout.CENTER);
-
 	}
 
 	/**
@@ -192,6 +140,9 @@ public class MultiThreadGUIPanel extends JPanel {
 		}
 	}
 
+	/**
+	 * Interrupts the process
+	 */
 	private synchronized void stopDraw() {
 		if (t != null) {
 			t.interrupt();
@@ -200,6 +151,8 @@ public class MultiThreadGUIPanel extends JPanel {
 	}
 
 	/**
+	 * Calls the paint method to draw a single pixel at the desired location
+	 * 
 	 * @param x
 	 * @param y
 	 */
@@ -215,7 +168,6 @@ public class MultiThreadGUIPanel extends JPanel {
 	 *
 	 */
 	private class ButtonListener implements ActionListener {
-
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (arg0.getSource() == clearButton) {
@@ -224,6 +176,5 @@ public class MultiThreadGUIPanel extends JPanel {
 				stopDraw();
 			}
 		}
-
 	}
 }
