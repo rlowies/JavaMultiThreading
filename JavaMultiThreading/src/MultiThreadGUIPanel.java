@@ -4,14 +4,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Scanner;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
@@ -32,59 +30,47 @@ public class MultiThreadGUIPanel extends JPanel {
 
 	private static final int HIRES_FONTSIZE = 26;// , LOWRES_FONTSIZE = 12;
 
-	private JButton showThreadsButton, startButton, stopButton, drawButton;
+	private JButton clearButton, drawButton, stopButton;
 
-	private int numThreads; // Current number of threads.
 
 	private JLabel threadLabel, timeLabel; // To display number of threads.
 
 	private JList<String> threadListJList; // List of the threads.
 
-	private Thread[] thread; // Thread variable.
-
-	private ThreadList threadList; // List of the created threads in String format.
-
-	private boolean isStarted = false; // Indicates if the threads are started.
+	private Thread t;
 
 	private Image image;
-	private JPanel eastPanel;
-	private boolean drawing = false;
-	
+
 	private static final int canvasWidth = 600;
 
 	private static final int canvasHeight = 400;
+
+	public Long startTime, stopTime;
+
+	protected boolean drawing = false;
 
 	/**
 	 * Constructs the window
 	 */
 	public MultiThreadGUIPanel() {
-		
-		setLayout(new BorderLayout());
-		threadList = new ThreadList();
 
-		westPanel();
-		centerPanel();
+		setLayout(new BorderLayout());
+
 		southPanel();
-		eastPanel(); // Canvas
+		westPanel();
+//		centerPanel();
+
+		createCanvas();
 	}
 
 	/**
-	 * To contain a graph or other information
+	 * Creates the canvas
 	 */
-	private void eastPanel() {
-		eastPanel = new JPanel();
-		eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.X_AXIS));
-		eastPanel.setBorder(BorderFactory.createEtchedBorder());
-		eastPanel.setPreferredSize(new Dimension(canvasWidth, canvasHeight));
-		
-		add(eastPanel, BorderLayout.EAST);
-		if(!drawing) {
+	private void createCanvas() {
 		image = new Image();
 		image.setCanvas(new Image());
 		image.getCanvas().setSize(canvasWidth, canvasHeight);
-		eastPanel.add(image.getCanvas());
-		}
-		
+		image.getCanvas().setVisible(true);
 	}
 
 	/**
@@ -98,8 +84,8 @@ public class MultiThreadGUIPanel extends JPanel {
 
 		threadLabel = new JLabel();
 		threadLabel.setText("Number of Threads: 0");
-		
-	    timeLabel = new JLabel();
+
+		timeLabel = new JLabel();
 		timeLabel.setText(" - Time elapsed: ");
 
 		southPanel.add(threadLabel);
@@ -117,38 +103,86 @@ public class MultiThreadGUIPanel extends JPanel {
 		/*
 		 * Create buttons
 		 */
-		startButton = new JButton();
-		showThreadsButton = new JButton();
-		stopButton = new JButton();
+	//	showThreadsButton = new JButton();
+		clearButton = new JButton();
 		drawButton = new JButton();
+		stopButton = new JButton();
 
 		// Set text
-		startButton.setText("Start");
-		showThreadsButton.setText("Show Threads");
-		stopButton.setText("Stop");
+		//showThreadsButton.setText("Show Threads");
+		clearButton.setText("Clear");
 		drawButton.setText("Draw");
+		stopButton.setText("Stop");
 
 		// Listeners
-		startButton.addActionListener(new ButtonListener());
-		showThreadsButton.addActionListener(new ButtonListener());
+		//showThreadsButton.addActionListener(new ButtonListener());
+		clearButton.addActionListener(new ButtonListener());
 		stopButton.addActionListener(new ButtonListener());
-		drawButton.addActionListener(new ButtonListener());
+
+		// Threaded
+		drawButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+
+				t = new Thread() {
+					@Override
+					public void run() {
+						buttonControl();
+						
+						startTime = System.currentTimeMillis(); // 1000L;//(System.currentTimeMillis() * (long) 0.001);
+						for (int x = 1; x < canvasWidth; x++) {
+							for (int y = 1; y < canvasHeight; y++) {
+								threadDraw(x, y);
+								
+								if(t.isInterrupted())
+								{
+									break;
+								}
+								// TODO: Add interrupt to allow button clicks for stopping
+								if (x == canvasWidth - 2) {
+									try {
+										stopTime = System.currentTimeMillis(); // 1000L;
+										timeLabel.setText(
+												" - Time elapsed: " + Long.toString(stopTime - startTime) + " ms");
+										t.join();
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}
+						}
+					}
+
+					private synchronized void buttonControl() {
+							drawButton.setEnabled(false);
+					}
+				};
+				t.start();
+			}
+
+		});
 
 		// Add to panel
-		westPanel.add(startButton);
-		westPanel.add(showThreadsButton);
-		westPanel.add(stopButton);
+		//westPanel.add(showThreadsButton);
+		westPanel.add(clearButton);
 		westPanel.add(drawButton);
+		westPanel.add(stopButton);
 
 	}
 
 	/**
 	 * Text for thread information to go here
 	 */
+	
+	@SuppressWarnings("unused") //for now
 	private void centerPanel() {
 
 		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.X_AXIS));
+		centerPanel.setLayout(null);
+		centerPanel.setBorder(BorderFactory.createEtchedBorder());
+		centerPanel.setSize(100, 100);
 		add(centerPanel, BorderLayout.CENTER);
 
 		threadListJList = new JList<String>();
@@ -163,68 +197,38 @@ public class MultiThreadGUIPanel extends JPanel {
 
 		JScrollPane scrollPane = new JScrollPane(threadListJList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setPreferredSize(new Dimension(600, 400));
+		scrollPane.setSize(new Dimension(600, 400));
 
 		// add the scroll pane to the left panel
 		scrollPane.setBorder(BorderFactory.createEtchedBorder());
+
 		centerPanel.add(scrollPane, BorderLayout.WEST);
 	}
 
 	/**
-	 * Creates threads and stores corresponding information.
+	 * Clears image
 	 */
-	private void startProcess() {
-		thread = new Threads[numThreads];
-		/*
-		 * Prevents the user from stacking threads if the stop button is not clicked
-		 * before starting.
-		 */
-		if (isStarted) {
-			stopProcess();
-		}
-		// Creates the specified number of threads
-		for (int i = 0; i < numThreads; i++) {
-			thread[i] = new Threads();
-			thread[i].start();
-			threadList.addThread((i + 1) + " - Thread ID: " + thread[i].getId());
-		}
-
-		isStarted = true;
-	}
-
-	/**
-	 * Clears threads and thread information
-	 */
-	private void stopProcess() {
-
-		if (isStarted) {
-//			thread.stopThreads();
-			threadList.clearList();
-			threadLabel.setText("Number of Threads: 0");
-			refreshList();
-			isStarted = false;
-			drawing = false;
-		}
-
-	}
-
-	/**
-	 * Maintaining readability
-	 */
-	private void refreshList() {
-		threadListJList.setListData(threadList.getThreadArray());
+	private synchronized void clearDraw() {
+		repaint();
+		drawButton.setEnabled(true);
 	}
 	
-	public void threadDraw(int x, int y) {
-		if(eastPanel != null) {
-			this.remove(eastPanel);
+	private synchronized void stopDraw() {
+		if(t != null) {
+		t.interrupt();
 		}
-		eastPanel();
+	}
+	
+	/**
+	 * @param x
+	 * @param y
+	 */
+	public void threadDraw(int x, int y) {
 		Graphics g = getGraphics();
 		image.paint(g, x, y, getWidth(), canvasHeight);
-		add(eastPanel, BorderLayout.EAST);
-		this.revalidate(); //TODO: remove this line and draw twice to see bug
+		revalidate(); // TODO: remove this line and draw twice to see bug
 	}
+
 	/**
 	 * @author ronlo
 	 * 
@@ -235,57 +239,12 @@ public class MultiThreadGUIPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (arg0.getSource() == showThreadsButton) {
-				refreshList();
-			} else if (arg0.getSource() == startButton) {
-
-				String result = JOptionPane.showInputDialog("Enter number of threads (Max 32)");
-				if (result == null || result.length() == 0) {
-					// Do nothing
-				} else {
-					Scanner in = new Scanner(result);
-					try {
-						numThreads = Integer.parseInt(in.next());
-					} catch (NumberFormatException e) {
-						// TODO: Add popup info
-						System.err.println("Must be an integer in the range (0 - 32)");
-					}
-					if (numThreads < 1 || numThreads > 32) {
-						startButton.doClick();
-					} else {
-						/*
-						 * Creates threads
-						 */
-						startProcess();
-						threadLabel.setText("Number of Threads: " + numThreads);
-					}
-					in.close();
-				}
-
+			 if (arg0.getSource() == clearButton) {
+				clearDraw();
 			} else if (arg0.getSource() == stopButton) {
-				stopProcess();
-			} else if (arg0.getSource() == drawButton) {
-				drawing = true;
-				//Draws a square
-				System.out.println(Thread.currentThread().getState());
-				for(int i = 0; i < numThreads; i++) {
-					thread[i].run();
-				}
-				long startTime = System.currentTimeMillis(); // 1000L;//(System.currentTimeMillis() * (long) 0.001);
-				for(int x = 1; x < canvasWidth; x++) {
-					for(int y = 1; y < canvasHeight; y++) {	
-						threadDraw(x, y);
-						//TODO: Add interrupt to allow button clicks for stopping
-					}
-				}
-				long stopTime = System.currentTimeMillis(); // 1000L;
-				
-				timeLabel.setText(" - Time elapsed: " + Long.toString(stopTime - startTime) + " ms");
-				
-				drawing = false;
+				stopDraw();
 			}
 		}
-
 
 	}
 

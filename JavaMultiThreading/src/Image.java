@@ -23,7 +23,7 @@ public class Image extends Canvas {
 	private void paintMore(Graphics2D g, int x, int y, int windowWidth, int windowHeight) {
 		g.fillRect(x + (windowWidth - canvas.getWidth()), y, 1, 1);
 		g.setColor(Color.BLUE);
-		g.fillRect(x + (windowWidth - canvas.getWidth()), y + (canvas.getHeight() - windowHeight), 1, 1);
+		g.fillRect(x + (windowWidth - canvas.getWidth()), y + (canvas.getHeight()), 1, 1);
 	}
 
 	public Canvas getCanvas() {
@@ -33,5 +33,4 @@ public class Image extends Canvas {
 	public void setCanvas(Canvas canvas) {
 		this.canvas = canvas;
 	}
-
 }
