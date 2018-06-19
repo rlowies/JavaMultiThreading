@@ -22,10 +22,11 @@ public class MultiThreadGUIPanel extends JPanel {
 	private JLabel timeLabel; // To display time taken to run
 	private Thread t;
 	private Image image;
-	private static final int canvasWidth = 600;
-	private static final int canvasHeight = 400;
+	private static final int canvasWidth = 2736;
+	private static final int canvasHeight = 1824;
 	public Long startTime, stopTime;
 	protected boolean drawing;
+	
 
 	/**
 	 * Constructs the window
@@ -158,7 +159,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	public void threadDraw(int x, int y) {
 		Graphics g = getGraphics();
-		image.paint(g, x, y, getWidth(), canvasHeight);
+		image.paint(g, x, y, canvasWidth, canvasHeight);
 	}
 
 	/**
