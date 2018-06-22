@@ -5,6 +5,9 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.util.Random;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+
 /**
  * This class controls drawing
  * 
@@ -19,13 +22,33 @@ public class Image extends Canvas {
 	private Canvas canvas;
 	public static int count;
 	public Random rand;
-	private int randomX,randomY;
+	private int randomX,randomY, randColor;
+	private Color[] colors;
+	private Color newColor;
+	private double probability;
 	
 	public Image() {
 		count = 0;
 		rand = new Random();
 		randomX = 0;
 		randomY = 0;
+		colors = new Color[10];
+		
+		initColors();
+		
+	}
+
+	private void initColors() {
+		colors[0] = Color.red;
+		colors[1] = Color.blue;
+		colors[2] = Color.green;
+		colors[3] = Color.yellow;
+		colors[4] = Color.black;
+		colors[5] = Color.orange;
+		colors[6] = Color.white;
+		colors[7] = Color.cyan;
+		colors[8] = Color.gray;
+		colors[9] = Color.magenta;
 	}
 
 	public void paint(Graphics g, int x, int y, int windowWidth, int windowHeight) {
@@ -44,83 +67,41 @@ public class Image extends Canvas {
 	 */
 	private void paintMore(Graphics2D g, int x, int y, int windowWidth, int windowHeight) {
 		
-	
-		if(count % 10 == 0) {
+		probability = rand.nextDouble();
+		
+		if(probability <= 0.06) { //6% chance of randomizing
 			randomX = rand.nextInt(windowWidth);
 			randomY = rand.nextInt(windowHeight);
+			randColor = rand.nextInt(10);
+			newColor = colors[randColor];
 		}
-//		g.fillRect(x + (windowWidth - canvas.getWidth()), y, 1, 1);
-//		g.setColor(Color.BLUE);
-//		g.fillRect(x + (windowWidth - canvas.getWidth()), y + (canvas.getHeight()), 1, 1);
-	//	g.setColor(Color.GREEN);
-	
+
 		
-		if(count % 10 == 1) {
-			g.setColor(Color.BLACK);
-			g.draw3DRect(x+randomX, Factorial(x+y), randomY, x+y, true);
-		} 
+		if(count < 50) {
+			g.setColor(newColor);
+			g.draw3DRect(randomX, randomY, 100, 100, true);	
+			}
 		
-		
-	     if (count % 20 == 1) {
-			g.setColor(Color.green);
-//			g.fill3DRect(windowWidth - x / 2, y, y-x, y+x, true);
-			g.fill3DRect(windowWidth - x*y, y, (y-randomX), x-randomY, true);
+		if(count > 50 && count < 100) {
+			g.setColor(newColor);
+//			g.drawOval(randomX, randomY, randomX, randomY);
+			g.drawLine(randomX, randomY, randomX, randomY);
 		}
 		
 		
-//		if(count % 10 == 1 && count % 5 == 1) 
-//		{
-//			g.setColor(Color.MAGENTA);
-//			
+		if(count > 150) {
+			g.setColor(newColor);
+			g.drawRect(randomX, randomY, 10, 100);
 			
-//			g.setColor(Color.black);
-			
-			if(count < 250) {
-				
-				///Gud
-				g.setColor(Color.GREEN);
-				g.drawLine(x + randomX, Factorial(y + windowHeight + randomY), (randomX / (randomX+1)), randomY);
-				g.setColor(Color.RED);
-				g.drawLine(x, Factorial(y+randomY), randomX, randomY);
-				///
-				
-				
-				
-				
-				
-//				g.drawOval(x, randomY,randomX, randomY);
-//			g.draw3DRect(randomX, randomY, y-x, randomX, true);
-//				g.drawOval(randomX + x, randomY, randomY, randomX*randomX);
-			}
-			else {
-				
-				
-				if(count > 1000) {
-					g.setColor(Color.DARK_GRAY);
-				} else if (count > 1000 || count < 1500)
-				{
-					g.setColor(Color.GRAY);
-				} 
-				g.draw3DRect(-randomX, randomY, (x-randomY)*y, -(y-randomX)*x, true);
-//				g.drawOval(x, randomY + y * 2,randomX, randomX);
-				
-			}
-			
-			if(count ==3000) {
-				
-				count = 0;
-			}
+		}
+		
+		
+		if (count == 200){
+			count = 0;
+		}
+		
 		
 		 count++;
-		
-		
-		
-		
-		
-//		g.setColor(Color.RED);
-//		g.fillArc(x, y + x, x-y, 1, x, y);
-		
-		
 		
 	}
 	
