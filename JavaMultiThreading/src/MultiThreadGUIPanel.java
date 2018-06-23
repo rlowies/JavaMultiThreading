@@ -1,11 +1,22 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.plaf.FontUIResource;
 
 /**
  * @author ronlo
@@ -22,8 +33,10 @@ public class MultiThreadGUIPanel extends JPanel {
 	private JLabel timeLabel; // To display time taken to run
 	private Thread t;
 	private Image image;
-	private static final int canvasWidth = 1920;
-	private static final int canvasHeight = 1080;
+	private JPanel centerPanel, settings;
+	JCheckBox randomized, fourEightyP, sevenTwentyP, tenEightyP;
+//	private static final int canvasWidth = 1280;
+//	private static final int canvasHeight = 1;
 	public Long startTime, stopTime;
 	protected boolean drawing;
 	
@@ -35,7 +48,66 @@ public class MultiThreadGUIPanel extends JPanel {
 		setLayout(new BorderLayout());
 		southPanel();
 		westPanel();
+		centerPanel();
+		
+		settingsPanel();
+		
+		
+		tabPanel();
+	}
+
+	private void settingsPanel() {
+		settings = new JPanel();
+		settings.setLayout(new BoxLayout(settings, BoxLayout.X_AXIS));
+		add(settings);
+		
+		randomized = new JCheckBox("Randomized");
+		
+		
+		settings.add(randomized);
+		
+		JPanel res = new JPanel();
+		res.setLayout(new BoxLayout(res, BoxLayout.X_AXIS));
+		res.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Resolution"));
+		
+		fourEightyP = new JCheckBox("480p");
+		sevenTwentyP = new JCheckBox("720p");
+		sevenTwentyP.setSelected(true); // default
+		tenEightyP = new JCheckBox("1080p");
+		
+		fourEightyP.addActionListener(new CheckBoxListener());
+		sevenTwentyP.addActionListener(new CheckBoxListener());
+		tenEightyP.addActionListener(new CheckBoxListener());
+		
+		res.add(fourEightyP);
+		res.add(sevenTwentyP);
+		res.add(tenEightyP);
+		
+		settings.add(res);
+		
+		
+	}
+
+	private void tabPanel() {
+		JTabbedPane tabbedPane = new JTabbedPane();
+		JPanel tabs = new JPanel();
+		tabs.setLayout(new FlowLayout());
+	
+		add(tabbedPane);
+		
+		tabbedPane.add("Canvas", centerPanel);
+		tabbedPane.add("Settings", settings);
+		
+	}
+
+	private void centerPanel() {
+		centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.X_AXIS));
+		add(centerPanel, BorderLayout.CENTER);
+		
 		createCanvas();
+		
+		centerPanel.add(image);
 	}
 
 	/**
@@ -44,7 +116,6 @@ public class MultiThreadGUIPanel extends JPanel {
 	private void createCanvas() {
 		image = new Image();
 		image.setCanvas(new Image());
-		image.getCanvas().setSize(canvasWidth, canvasHeight);
 		image.getCanvas().setVisible(true);
 	}
 
@@ -66,6 +137,8 @@ public class MultiThreadGUIPanel extends JPanel {
 	private void westPanel() {
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
+		westPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Control Panel"));
+		westPanel.setPreferredSize(new Dimension(400,400));
 		add(westPanel, BorderLayout.WEST);
 		// Create buttons
 		clearButton = new JButton();
@@ -89,13 +162,13 @@ public class MultiThreadGUIPanel extends JPanel {
 						buttonControl();
 						drawing = true;
 						startTime = System.currentTimeMillis();
-						for (int x = 0; x <= canvasWidth; x++) {
-							for (int y = 0; y <= canvasHeight; y++) {
+						for (int x = 0; x <= image.getWidth(); x++) {
+							for (int y = 0; y <= image.getHeight(); y++) {
 								threadDraw(x, y);
 								if (t.isInterrupted()) {
 									break;
 								}
-								if (x == canvasWidth - 1) {
+								if (x == image.getWidth() - 1) {
 									stopButton.setEnabled(false);
 									drawing = false;
 									try {
@@ -133,7 +206,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	 * Clears image
 	 */
 	private synchronized void clearDraw() {
-		repaint();
+		image.repaint();
 		if (drawing) {
 			drawButton.setEnabled(false);
 		} else {
@@ -152,14 +225,21 @@ public class MultiThreadGUIPanel extends JPanel {
 	}
 
 	/**
-	 * Calls the paint method to draw a single pixel at the desired location
+	 * Calls the paint method to draw
 	 * 
 	 * @param x
 	 * @param y
 	 */
 	public void threadDraw(int x, int y) {
-		Graphics g = getGraphics();
-		image.paint(g, x, y, canvasWidth, canvasHeight);
+		
+		if(randomized.isSelected()) {
+			image.paintRandom((Graphics2D) image.getGraphics(), x, y);
+		} else
+		{
+			image.paint(image.getGraphics(), x, y);
+		}
+		
+		
 	}
 
 	/**
@@ -177,5 +257,31 @@ public class MultiThreadGUIPanel extends JPanel {
 				stopDraw();
 			}
 		}
+	}
+	/**
+	 * @author ronlo
+	 * 
+	 * Listens for checkbox clicks
+	 *
+	 */
+	public class CheckBoxListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if(arg0.getSource() == fourEightyP) {
+					sevenTwentyP.setSelected(false);
+					tenEightyP.setSelected(false);
+					image.setDimension(640,480);
+			} else if(arg0.getSource() == sevenTwentyP) {
+					fourEightyP.setSelected(false);
+					tenEightyP.setSelected(false);
+					image.setDimension(1280,720);
+			} else if(arg0.getSource() == tenEightyP) {
+					fourEightyP.setSelected(false);
+					sevenTwentyP.setSelected(false);
+					image.setDimension(1920,1080);
+			}
+		}
+
 	}
 }
