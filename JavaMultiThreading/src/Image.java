@@ -42,9 +42,9 @@ public class Image extends Canvas {
 		colors[2] = Color.green;
 //		colors[3] = Color.yellow;
 		colors[4] = Color.black;
-//		colors[5] = Color.orange;
+		colors[5] = Color.orange;
 //		colors[6] = Color.white;
-//		colors[7] = Color.cyan;
+		colors[7] = Color.cyan;
 //		colors[8] = Color.gray;
 //		colors[9] = Color.magenta;
 	}
@@ -78,17 +78,17 @@ public class Image extends Canvas {
 		}
 		if(count < 50) {
 			g.setColor(newColor);
-			g.draw3DRect(randomX, randomY, 100, 100, true);	
+			g.drawLine(randomX, randomY, 100, 100);	
 			}
 		if(count > 50 && count < 100) {
 			g.setColor(newColor);
 			g.drawLine(randomX, randomY, randomX, randomY);
 		}
-		if(count > 150) {
-			g.setColor(newColor);
-			g.drawRect(randomX, randomY, 10, 100);
-			
-		}
+//		if(count > 150) {
+//			g.setColor(newColor);
+//			g.drawRect(randomX, randomY, 10, 100);
+//			
+//		}
 		
 		if (count == 200){
 			count = 0;
