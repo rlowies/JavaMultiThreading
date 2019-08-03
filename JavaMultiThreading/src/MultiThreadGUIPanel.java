@@ -34,7 +34,7 @@ public class MultiThreadGUIPanel extends JPanel {
 	private Thread t;
 	private Image image;
 	private JPanel centerPanel, settings;
-	JCheckBox randomized, fourEightyP, sevenTwentyP, tenEightyP;
+	JCheckBox randomized, fourEightyP, sevenTwentyP, tenEightyP, collatz;
 //	private static final int canvasWidth = 1280;
 //	private static final int canvasHeight = 1;
 	public Long startTime, stopTime;
@@ -62,9 +62,11 @@ public class MultiThreadGUIPanel extends JPanel {
 		add(settings);
 		
 		randomized = new JCheckBox("Randomized");
-		
+		collatz = new JCheckBox("Collatz Conjecture");
+		collatz.setSelected(true);
 		
 		settings.add(randomized);
+		settings.add(collatz);
 		
 		JPanel res = new JPanel();
 		res.setLayout(new BoxLayout(res, BoxLayout.X_AXIS));
@@ -72,8 +74,8 @@ public class MultiThreadGUIPanel extends JPanel {
 		
 		fourEightyP = new JCheckBox("480p");
 		sevenTwentyP = new JCheckBox("720p");
-		sevenTwentyP.setSelected(true); // default
 		tenEightyP = new JCheckBox("1080p");
+		tenEightyP.setSelected(true); // default
 		
 		fourEightyP.addActionListener(new CheckBoxListener());
 		sevenTwentyP.addActionListener(new CheckBoxListener());
@@ -164,7 +166,7 @@ public class MultiThreadGUIPanel extends JPanel {
 						startTime = System.currentTimeMillis();
 						for (int x = 0; x <= image.getWidth(); x++) {
 							for (int y = 0; y <= image.getHeight(); y++) {
-								threadDraw(x, y);
+								threadDraw(x = x == image.getWidth() - 1 ? 0 : x, y = y == image.getHeight() - 1 ? 0 : y);
 								if (t.isInterrupted()) {
 									break;
 								}
@@ -232,9 +234,14 @@ public class MultiThreadGUIPanel extends JPanel {
 	 */
 	public void threadDraw(int x, int y) {
 		
-		if(randomized.isSelected()) {
+		if(randomized.isSelected()) 
+		{
 			image.paintRandom((Graphics2D) image.getGraphics(), x, y);
-		} else
+		} 
+		else if (collatz.isSelected()) {
+			image.paintCollatz((Graphics2D) image.getGraphics(), x, y);
+		}
+		else
 		{
 			image.paint(image.getGraphics(), x, y);
 		}
