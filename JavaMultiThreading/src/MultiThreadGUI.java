@@ -24,7 +24,7 @@ public class MultiThreadGUI {
 		JFrame frame = new JFrame("Multi Threading");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(new MultiThreadGUIPanel());
-		frame.setPreferredSize(new Dimension(1920, 1080));
+		frame.setPreferredSize(new Dimension(1280, 720));
 		frame.pack();
 		frame.setVisible(true);
 

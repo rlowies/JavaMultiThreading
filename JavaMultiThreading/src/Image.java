@@ -42,10 +42,10 @@ public class Image extends Canvas {
 	
 	private void initColors2() {
 //		colors2[0] = Color.red;
-		colors2[1] = Color.blue;
-//		colors2[2] = Color.green;
+//		colors2[1] = Color.blue;
+		colors2[2] = Color.green;
 //		colors2[3] = Color.yellow;
-//		colors2[4] = Color.black;
+		colors2[4] = Color.black;
 //		colors2[5] = Color.orange;
 //		colors2[6] = Color.white;
 //		colors2[7] = Color.cyan;
@@ -54,15 +54,15 @@ public class Image extends Canvas {
 	}
 
 	private void initColors() {
-//		colors[0] = Color.red;
+		colors[0] = Color.red;
 //		colors[1] = Color.blue;
 //		colors[2] = Color.green;
 //		colors[3] = Color.yellow;
 		colors[4] = Color.black;
 //		colors[5] = Color.orange;
-		colors[6] = Color.white;
+//		colors[6] = Color.white;
 //		colors[7] = Color.cyan;
-		colors[8] = Color.gray;
+//		colors[8] = Color.gray;
 //		colors[9] = Color.magenta;
 	}
 
@@ -129,21 +129,21 @@ public class Image extends Canvas {
 		
 		
 		probability = rand.nextDouble();
-		int polySize = 30000;
+		int polySize = 100;
 		int[] xPoints= new int[polySize], yPoints = new int[polySize];
 		int[] xPoints2= new int[polySize], yPoints2 = new int[polySize];
-		if(probability <= 0.80) { //50% chance of randomizing
-			collatzX1 = collatzConjecture(rand.nextInt(windowWidth / 2));
-			collatzY1 = collatzConjecture(rand.nextInt(windowHeight / 2));
-			collatzX2 = collatzConjecture(myst(collatzX1 / 2));
-			collatzY2 = collatzConjecture(myst(collatzY1 / 2));
+		if(probability <= 0.333) { 
+			collatzX1 = collatzConjecture(rand.nextInt(windowWidth));
+			collatzY1 = collatzConjecture(rand.nextInt(windowHeight));
+			collatzX2 = collatzConjecture(myst(collatzX1));
+			collatzY2 = collatzConjecture(myst(collatzY1));
 			xPoints[0] = collatzX1;
-			yPoints[0] = collatzY2;
+			yPoints[0] = collatzY1;
 			for(int i = 1; i < polySize; i++) {
-				xPoints[i] = xPoints[i-1]*yPoints[i-1]+polySize*collatzX1 * (((collatzX2 + i*collatzX1)*xPoints[i-1])*yPoints[i-1] + 1);
-				yPoints[i] = yPoints[i-1]*xPoints[i-1]+polySize*collatzY1 * (((collatzY2 + i*collatzY1)*yPoints[i-1])*xPoints[i-1] + 1);
-				xPoints2[i] = xPoints[i-1]*yPoints[i-1]+polySize*collatzX1;
-				yPoints2[i] = yPoints[i-1]*xPoints[i-1]+polySize*collatzY1;
+				xPoints[i] = xPoints[i-1]+collatzY1;
+				yPoints[i] = yPoints[i-1]+collatzX1;
+				xPoints2[i] = xPoints[i-1]+collatzY2;
+				yPoints2[i] = yPoints[i-1]+collatzX2;
 			}
 			
 			randColor = rand.nextInt(colors.length);
@@ -151,14 +151,14 @@ public class Image extends Canvas {
 			newColor = colors[randColor];
 			boxColor = colors2[randColor2];
 		}
-		if(count < 50) {
-			g.setColor(wow ? newColor : boxColor);
+		if(count < 98) {
+			g.setColor(newColor);
 			g.drawPolygon(xPoints, yPoints, polySize);
 //			g.drawLine(x, y, collatzX1 / (x+1), y);	
 			}
-		if(count > 50 && count < 100) {
-			g.setColor(wow ? boxColor : newColor);
-			g.drawPolygon(yPoints, xPoints, polySize);
+		if(count > 98 && count < 100) {
+			g.setColor(boxColor);
+			g.drawPolygon(xPoints2, yPoints2, polySize);
 		}
 //		if(count > 150) {
 //			g.setColor(newColor);
